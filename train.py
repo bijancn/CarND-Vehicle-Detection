@@ -2,7 +2,6 @@ import sklearn
 import glob
 import pickle
 import os
-import cv2
 import numpy as np
 import skimage.io
 import matplotlib.pyplot as plt
