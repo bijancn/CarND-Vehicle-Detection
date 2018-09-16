@@ -7,6 +7,12 @@ from keras import optimizers, callbacks
 from model import *
 
 
+SAVE_IMAGES = False
+model = create_model()
+model.summary()
+model.add(Flatten())
+
+
 def show_images(X_train):
   fig = plt.figure(figsize=(12, 6))
   for i in range(0, 30):
@@ -17,7 +23,7 @@ def show_images(X_train):
     plt.yticks(np.array([]))
     axis.imshow(X_train[number])
   fig.tight_layout()
-  plt.show()
+  plt.savefig("output_images/training_data_overview.png")
 
 
 def plot_training(hist):
@@ -37,17 +43,22 @@ def plot_training(hist):
 
 
 X_train, X_test, Y_train, Y_test = load_data()
-adam = optimizers.Adam(lr=0.0001)
-model.compile(loss='mean_absolute_error', optimizer=adam, metrics=['accuracy'])
-checkpoint = callbacks.ModelCheckpoint("weights.{epoch:02d}-{val_loss:.2f}.hdf5",
+if (SAVE_IMAGES):
+    show_images(X_train)
+    exit()
+
+#  adam = optimizers.Adam(lr=0.00005)
+#  model.compile(loss='mean_absolute_error', optimizer=adam, metrics=['accuracy'])
+model.compile(loss='mse',optimizer='rmsprop',metrics=['accuracy'])
+checkpoint = callbacks.ModelCheckpoint("weights.{epoch:02d}-{val_loss:.3f}.hdf5",
                           monitor='val_loss',
                           verbose=1,
                           save_best_only=True,
                           save_weights_only=False,
                           mode='auto',
                           period=1)
-earlystop = callbacks.EarlyStopping(monitor='val_loss', min_delta=0.0001,
-                                    patience=3, verbose=1, mode='auto')
+earlystop = callbacks.EarlyStopping(monitor='val_loss', min_delta=0.00001,
+                                    patience=5, verbose=1, mode='auto')
 
 hist = model.fit(X_train, Y_train,
                  batch_size=128,
@@ -57,5 +68,6 @@ hist = model.fit(X_train, Y_train,
                  callbacks=[checkpoint, earlystop])
 
 print(hist.history)
-plot_training(hist)
+pickle.dump(hist.history, open( "history.pickle", "wb" ) )
 model.save_weights('./model.h5')
+plot_training(hist)

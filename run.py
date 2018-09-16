@@ -28,6 +28,7 @@ box_size = 8
 # Create model with bigger input and without final flatten layer
 heatmodel = create_model((ymax - ymin, xmax, 3))
 heatmodel.load_weights('./weights.13-0.02.hdf5')
+SAVE_IMAGES = False
 
 
 def draw_boxes(img, bounding_boxes, color=(0, 0, 255), thick=6):
@@ -94,17 +95,6 @@ def process_image(img):
   draw_img = draw_labeled_bboxes(img, boxes)
   return draw_img
 
-for image in glob.glob("test_images/*.jpg"):
-    prev_frames = []
-    prev_curvatures = []
-    prev_car_off = []
-    img = skimage.io.imread(image)
-    img_lane = process_image(img)
-    fig = plt.figure(figsize=(12,20))
-    plt.imshow(img_lane)
-    fig.savefig('output_images/' + image, bbox_inches='tight', pad_inches=0)
-
-history = None
 
 def pipeline(img):
     boxes = find_boxes(img)
@@ -120,11 +110,25 @@ def pipeline(img):
             cv2.rectangle(img, (box[0], box[1]), (box[2],box[3]), (0,255,0), 6)
     return img
 
+if (SAVE_IMAGES):
+  for image in glob.glob("test_images/*.jpg"):
+      prev_frames = []
+      prev_curvatures = []
+      prev_car_off = []
+      img = skimage.io.imread(image)
+      img_lane = process_image(img)
+      fig = plt.figure(figsize=(12,20))
+      plt.imshow(img_lane)
+      fig.savefig('output_images/' + image, bbox_inches='tight', pad_inches=0)
+
+history = None
+
 prev_frames = []
 prev_curvatures = []
 prev_car_off = []
-history = deque(maxlen=30)
-video = 'test_video.mp4'
+history = deque(maxlen=15)
+#  video = 'test_video.mp4'
+video = 'project_video.mp4'
 clip = VideoFileClip(video)
 clip_output = 'output_videos/' + video
 clip_process = clip.fl_image(pipeline)
