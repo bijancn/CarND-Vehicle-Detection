@@ -30,7 +30,7 @@ probability_threshold = 0.999999
 heatmodel = create_model((ymax - ymin, xmax, 3))
 heatmodel.load_weights('./model.h5')
 heatmodel.summary()
-SAVE_IMAGES = False
+SAVE_IMAGES = True
 
 
 def draw_boxes(img, bounding_boxes, color=(255, 0, 0), thick=2):
