@@ -15,12 +15,7 @@ network on car images following the suggestions from numerous students in the
 [image2]: ./output_images/test_images/test1.jpg
 [training1]: ./hist_accuracy.png
 [training2]: ./hist_loss.png
-[image3]: ./examples/sliding_windows.jpg
-[image4]: ./examples/sliding_window.jpg
-[image5]: ./examples/bboxes_and_heat.png
-[image6]: ./examples/labels_map.png
-[image7]: ./examples/output_bboxes.png
-[video1]: ./project_video.mp4
+[image3]: ./output_images/heat/test_images/test1.jpg
 
 ## Model architecture and training
 
@@ -107,22 +102,22 @@ The final training run had the following history of validation accuracy and loss
 ![alt text][training2]
 
 reaching `val_loss: 0.0038 - val_acc: 0.9949` at epoch 12, which did not improve
-over the next 5 epochs, leading to an early stop in epoch 17. The used weights
-correspond to epoch 12 as well.
+over the next 5 epochs, leading to an early stop in epoch 17. The finally used
+weights for the next section thus correspond to epoch 12.
 
 ## Combining the results of the neural network
 To reuse our model that has been trained on the 64x64 images, we simply change
 the input dimensions from `(64,64,3)` to `(ymax - ymin, xmax, 3)`, whereby I
-only feed in the part of the image that is relevant for vehicle detection `ymax
-= 660` and `ymin = 400`.  Keras then takes care to adapt the dimensions of all
-following layers.  On the horizontal, the whole image is used, thus `xmax =
+only feed in the part of the image that is relevant for vehicle detection, i.e.
+`ymax = 660` and `ymin = 400`.  Keras then takes care to adapt the dimensions of
+all following layers.  On the horizontal, the whole image is used, thus `xmax =
 1280`. The cropping in the vertical speeds up the processing and avoids bogus
 detections. With this adapted model, we load in the trained model weights and
 use it to `predict` in the `search_cars` function. The output of this are images
 themselves attached with the probability that it is a car. I only keep images
-that have a probability that is higher than `probability_threshold = 0.999`.
+that have a probability that is higher than `probability_threshold = 0.999999`.
 Convolutional neural networks seem really appropriate for this task as we don't
-have to invent a weird sliding window search but obtain this naturally. To be
+have to come up with a sliding window strategy but obtain this naturally. To be
 specific, the output shape of the last layer is `(25, 153, 1)` instead of `(1,
 1, 1)`.  This output is shown here as the small red windows:
 
@@ -130,38 +125,44 @@ specific, the output shape of the last layer is `(25, 153, 1)` instead of `(1,
 
 All other test images can be found in
 [output_images/test_images](output_images/test_images). To decide which of
-these to keep, we can add for each of these windows +1, see `add_heat`,
+these to keep, we can add for each of these windows +1, see `add_heat`, to
+generate a heat map for the whole image. Hereby, we only keep the pixels that
+have at least three positive confirmations to reduce the number of false
+positives. Finally, we use `scipy.ndimage.measurements.label` to find labelled
+features in this heat map. I assume that each of the found blobs correspond to a
+vehicle. This constitutes the main logic of the pipeline to `find_boxes`.
 
-The basic pipeline is described in `find_boxes` of `run.py`.
+Here is an example of the heat map for the same image shown above. All other
+heat maps for the test images can be found in
+[output_images/heat/test_images](output_images/heat/test_images).
 
+![alt text][image3]
+
+---
 
 ## Video implementation
+Here's a [link to my video result](./project_video.mp4).
+
+In addition to the logic that was implemented for single pictures as described
+in the last section, I keep track of the last 30 frames and use
+`cv2.groupRectangles` with a group threshold of 10 and an epsilon 0.1 to cluster
+the similar rectangles together.
+
+---
 
 ## Discussion
 
 
-
-
-
-
-### Sliding Window Search
-
-#### 2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
-
-Ultimately I searched on two scales using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
-
-![alt text][image4]
----
-
 ### Video Implementation
-
-#### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
-Here's a [link to my video result](./project_video.mp4)
-
 
 #### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
 
-I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.
+I recorded the positions of positive detections in each frame of the video.
+From the positive detections I created a heatmap and then thresholded that map
+to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()`
+to identify individual blobs in the heatmap.  I then assumed each blob
+corresponded to a vehicle.  I constructed bounding boxes to cover the area of
+each blob detected.
 
 Here's an example result showing the heatmap from a series of frames of video, the result of `scipy.ndimage.measurements.label()` and the bounding boxes then overlaid on the last frame of video:
 
@@ -179,7 +180,7 @@ Here's an example result showing the heatmap from a series of frames of video, t
 
 ---
 
-### Discussion
+## Discussion
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 

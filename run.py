@@ -31,6 +31,7 @@ heatmodel = create_model((ymax - ymin, xmax, 3))
 heatmodel.load_weights('./model.h5')
 heatmodel.summary()
 SAVE_IMAGES = True
+DRAW_HEATMAP = True
 
 
 def draw_boxes(img, bounding_boxes, color=(255, 0, 0), thick=2):
@@ -80,19 +81,24 @@ def draw_labeled_bboxes(img, boxes):
     return img
 
 
-def find_boxes(img):
+def find_boxes(img, imagename=''):
   hot_windows = search_cars(img)
   window_img = draw_boxes(img, hot_windows)
   heat = np.zeros_like(img[:,:,0]).astype(np.float)
-  heat = add_heat(heat,hot_windows)
+  heat = add_heat(heat, hot_windows)
   heat = apply_threshold(heat, 3)
   heatmap = np.clip(heat, 0, 255)
+  if (DRAW_HEATMAP):
+    fig = plt.figure()
+    plt.imshow(heatmap)
+    fig.savefig('output_images/heat/' + imagename, bbox_inches='tight', pad_inches=0)
+
   boxes = label(heatmap)
   return boxes, window_img
 
 
-def process_image(img):
-  boxes, window_img = find_boxes(img)
+def process_image(img, imagename):
+  boxes, window_img = find_boxes(img, imagename)
   draw_img = draw_labeled_bboxes(window_img, boxes)
   return draw_img
 
@@ -117,7 +123,7 @@ if (SAVE_IMAGES):
       prev_curvatures = []
       prev_car_off = []
       img = skimage.io.imread(image)
-      img_lane = process_image(img)
+      img_lane = process_image(img, image)
       fig = plt.figure(figsize=(12,20))
       plt.imshow(img_lane)
       fig.savefig('output_images/' + image, bbox_inches='tight', pad_inches=0)
