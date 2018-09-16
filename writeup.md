@@ -132,8 +132,8 @@ positives. Finally, we use `scipy.ndimage.measurements.label` to find labelled
 features in this heat map. I assume that each of the found blobs correspond to a
 vehicle. This constitutes the main logic of the pipeline to `find_boxes`.
 
-Here is an example of the heat map for the same image shown above. All other
-heat maps for the test images can be found in
+Here is an example of the heat map after thresholding for the same image shown
+above. All other heat maps for the test images can be found in
 [output_images/heat/test_images](output_images/heat/test_images).
 
 ![alt text][image3]
@@ -152,37 +152,20 @@ the similar rectangles together.
 
 ## Discussion
 
+In this project, I have preferred the convolutional neural networks over the
+Histogram of Oriented Gradients method as it involves far less parameters to
+tune and is a very natural method for the problem to solve. I mainly had to
+ensure a good training on the input data and could from then on rely on it and
+only tweak the parameters for drawing the final rectangles around the cars.
 
-### Video Implementation
+The first potential pitfalls of this model are the used training data. The
+training input is certainly not exhaustitive to cover all possible lighting
+situations. As a first step, I could include the other data sets that have been
+made available. Furthermore, given that I haven't performed any perspective
+transform or rescaling of the data, the pipeline should just perform well on
+cars that have roughly the appropriate size. However, it performs surprisingly
+well both for far and close cars.
 
-#### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
-
-I recorded the positions of positive detections in each frame of the video.
-From the positive detections I created a heatmap and then thresholded that map
-to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()`
-to identify individual blobs in the heatmap.  I then assumed each blob
-corresponded to a vehicle.  I constructed bounding boxes to cover the area of
-each blob detected.
-
-Here's an example result showing the heatmap from a series of frames of video, the result of `scipy.ndimage.measurements.label()` and the bounding boxes then overlaid on the last frame of video:
-
-### Here are six frames and their corresponding heatmaps:
-
-![alt text][image5]
-
-### Here is the output of `scipy.ndimage.measurements.label()` on the integrated heatmap from all six frames:
-![alt text][image6]
-
-### Here the resulting bounding boxes are drawn onto the last frame in the series:
-![alt text][image7]
-
-
-
----
-
-## Discussion
-
-#### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
-
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.
-
+Other problems are in the continuity: The pipeline misses ocassional frames,
+which I haven't fully understood yet. It could potentially be improved by
+working on the smoothing across frames.
