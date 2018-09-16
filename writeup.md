@@ -104,23 +104,25 @@ machine, I used a batch size of 128.
 The final training run had the following history of validation accuracy and loss
 ![alt text][training1]
 ![alt text][training2]
+reaching `val_loss: 0.0038 - val_acc: 0.9949` at epoch 12, which did not improve
+over the next 5 epochs, leading to an early stop in epoch 17. The used weights
+correspond to epoch 12 as well.
 
-
-## Combining the results of the neural network To reuse our model that has been
-trained on the 64x64 images, we simply change the input dimensions from
-`(64,64,3)` to `(ymax - ymin, xmax, 3)`, whereby I only feed in the part of the
-image that is relevant for vehicle detection `ymax = 660` and `ymin = 400`.
-Keras then takes care to adapt the dimensions of all following layers.  On the
-horizontal, the whole image is used, thus `xmax = 1280`. The cropping in the
-vertical speeds up the processing and avoids bogus detections. With this
-adapted model, we load in the trained model weights and use it to `predict` in
-the `search_cars` function. The output of this are images themselves attached
-with the probability that it is a car. I only keep images that have a
-probability that is higher than `probability_threshold = 0.999`. Convolutional
-neural networks seem really appropriate for this task as we don't have to
-invent a weird sliding window search but obtain this naturally. To be specific,
-the output shape of the last layer is `(25, 153, 1)` instead of `(1, 1, 1)`.
-This output is shown here as the small red windows:
+## Combining the results of the neural network
+To reuse our model that has been trained on the 64x64 images, we simply change
+the input dimensions from `(64,64,3)` to `(ymax - ymin, xmax, 3)`, whereby I
+only feed in the part of the image that is relevant for vehicle detection `ymax
+= 660` and `ymin = 400`.  Keras then takes care to adapt the dimensions of all
+following layers.  On the horizontal, the whole image is used, thus `xmax =
+1280`. The cropping in the vertical speeds up the processing and avoids bogus
+detections. With this adapted model, we load in the trained model weights and
+use it to `predict` in the `search_cars` function. The output of this are images
+themselves attached with the probability that it is a car. I only keep images
+that have a probability that is higher than `probability_threshold = 0.999`.
+Convolutional neural networks seem really appropriate for this task as we don't
+have to invent a weird sliding window search but obtain this naturally. To be
+specific, the output shape of the last layer is `(25, 153, 1)` instead of `(1,
+1, 1)`.  This output is shown here as the small red windows:
 
 ![alt text][image2]
 
@@ -129,8 +131,6 @@ All other test images can be found in
 these to keep, we can add for each of these windows +1, see `add_heat`,
 
 The basic pipeline is described in `find_boxes` of `run.py`.
-
-## Sliding Window Search
 
 
 ## Video implementation
