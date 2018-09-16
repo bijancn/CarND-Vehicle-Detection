@@ -26,13 +26,13 @@ network on car images following the suggestions from numerous students in the
 
 The model architecture is a very simple one, consisting almost exclusively of
 convolutional layers connected with rectified linear units (`relu`) with only
-one intermediate pooling layer as inspired by
+one pooling layer as inspired by
 https://arxiv.org/pdf/1412.6806.pdf and various discussions in the
 `#s-t1-deep-learning` channel.
 
 The model definition is found in `model.py`, which is used both for the script
 to train the model (`train.py`) and the script to run the model in the image
-processing pipeline (`run.py`). To avoid overfitting, we add dropout layers
+processing pipeline (`run.py`). To avoid overfitting, I add dropout layers
 with 50 % drop out inbetween the convolution layers.
 ```
 Layer (type)                 Output Shape              Param #
@@ -65,7 +65,7 @@ Non-trainable params: 0
 ```
 This is followed for the training by a final `Flatten` layer to be able to
 compare with the binary car/non-car label. When running the model in the
-pipeline, we omit this layer as we want to use the image output of the
+pipeline, I omit this layer as I want to use the image output of the
 convolutional network.
 
 ### Udacity training set
@@ -86,7 +86,7 @@ sets:
 867 noncars to 909 cars in test set (1 : 0.953795379538 )
 ```
 This is important to avoid that the model prefers one category over the other
-in training or validation. Here is an example from the set, whereby we label
+in training or validation. Here is an example from the set, whereby I label
 cars as `1.0` and non-cars as `0.0`:
 
 ![alt text][image1]
