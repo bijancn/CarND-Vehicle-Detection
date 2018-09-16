@@ -125,12 +125,13 @@ specific, the output shape of the last layer is `(25, 153, 1)` instead of `(1,
 
 All other test images can be found in
 [output_images/test_images](output_images/test_images). To decide which of
-these to keep, we can add for each of these windows +1, see `add_heat`, to
-generate a heat map for the whole image. Hereby, we only keep the pixels that
-have at least three positive confirmations to reduce the number of false
-positives. Finally, we use `scipy.ndimage.measurements.label` to find labelled
-features in this heat map. I assume that each of the found blobs correspond to a
-vehicle. This constitutes the main logic of the pipeline to `find_boxes`.
+the small red windows to keep, we can add for each pixel of these windows +1 to
+an empty image, see `add_heat`, to generate a heat map for the whole image.
+Hereby, we only keep the pixels that have at least three positive confirmations
+to reduce the number of false positives. Finally, we use
+`scipy.ndimage.measurements.label` to find labelled features in this heat map. I
+assume that each of the found blobs correspond to a vehicle. This constitutes
+the main logic of the pipeline to `find_boxes`.
 
 Here is an example of the heat map after thresholding for the same image shown
 above. All other heat maps for the test images can be found in
