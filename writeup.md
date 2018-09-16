@@ -102,8 +102,10 @@ activated an `EarlyStopping` callback. To make optimal use of the `g2.2xlarge`
 machine, I used a batch size of 128.
 
 The final training run had the following history of validation accuracy and loss
+
 ![alt text][training1]
 ![alt text][training2]
+
 reaching `val_loss: 0.0038 - val_acc: 0.9949` at epoch 12, which did not improve
 over the next 5 epochs, leading to an early stop in epoch 17. The used weights
 correspond to epoch 12 as well.
