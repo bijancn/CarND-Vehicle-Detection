@@ -5,17 +5,12 @@ For this project, I decided not to implement the Histogram of Oriented Gradients
 network on car images following the suggestions from numerous students in the
 `#s-t1-deep-learning` channel.
 
-* Run your pipeline on a video stream (start with the test_video.mp4 and later
-  implement on full project_video.mp4) and create a heat map of recurring
-  detections frame by frame to reject outliers and follow detected vehicles.
-* Estimate a bounding box for vehicles detected.
-
 [//]: # (Image References)
 [image1]: ./output_images/training_data_overview.png
 [image2]: ./output_images/test_images/test1.jpg
+[image3]: ./output_images/heat/test_images/test1.jpg
 [training1]: ./hist_accuracy.png
 [training2]: ./hist_loss.png
-[image3]: ./output_images/heat/test_images/test1.jpg
 
 ## Model architecture and training
 
@@ -106,29 +101,30 @@ over the next 5 epochs, leading to an early stop in epoch 17. The finally used
 weights for the next section thus correspond to epoch 12.
 
 ## Combining the results of the neural network
-To reuse our model that has been trained on the 64x64 images, we simply change
+To reuse the model that has been trained on the 64x64 images, I simply change
 the input dimensions from `(64,64,3)` to `(ymax - ymin, xmax, 3)`, whereby I
 only feed in the part of the image that is relevant for vehicle detection, i.e.
 `ymax = 660` and `ymin = 400`.  Keras then takes care to adapt the dimensions of
 all following layers.  On the horizontal, the whole image is used, thus `xmax =
 1280`. The cropping in the vertical speeds up the processing and avoids bogus
-detections. With this adapted model, we load in the trained model weights and
+detections. With this adapted model, I load in the trained model weights and
 use it to `predict` in the `search_cars` function. The output of this are images
 themselves attached with the probability that it is a car. I only keep images
 that have a probability that is higher than `probability_threshold = 0.999999`.
-Convolutional neural networks seem really appropriate for this task as we don't
-have to come up with a sliding window strategy but obtain this naturally. To be
-specific, the output shape of the last layer is `(25, 153, 1)` instead of `(1,
-1, 1)`.  This output is shown here as the small red windows:
+Convolutional neural networks seem really appropriate for this task as I don't
+have to come up with a sliding window strategy but obtain the highly probably
+windows of cars naturally. To be specific, the output shape of the last layer is
+`(25, 153, 1)` instead of `(1, 1, 1)`.  This output is shown here as the small
+red windows:
 
 ![alt text][image2]
 
 All other test images can be found in
 [output_images/test_images](output_images/test_images). To decide which of
-the small red windows to keep, we can add for each pixel of these windows +1 to
-an empty image, see `add_heat`, to generate a heat map for the whole image.
-Hereby, we only keep the pixels that have at least three positive confirmations
-to reduce the number of false positives. Finally, we use
+the small red windows to keep, I can add for each pixel of these windows +1 to
+an empty image, c.f. `add_heat`, to generate a heat map for the whole image.
+Hereby, I only keep the pixels that have at least three positive confirmations
+to reduce the number of false positives. Finally, I use
 `scipy.ndimage.measurements.label` to find labelled features in this heat map. I
 assume that each of the found blobs correspond to a vehicle. This constitutes
 the main logic of the pipeline to `find_boxes`.
