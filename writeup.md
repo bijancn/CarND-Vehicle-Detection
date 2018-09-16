@@ -112,9 +112,9 @@ use it to `predict` in the `search_cars` function. The output of this are images
 themselves attached with the probability that it is a car. I only keep images
 that have a probability that is higher than `probability_threshold = 0.999999`.
 For the representation on the final image, we have to remember that we have used
-64x64 images, thus the detected frames are 64x64 as well. Convolutional neural
-networks seem really appropriate for this task as I don't have to come up with a
-sliding window strategy but obtain the highly probably windows of cars
+64x64 images, thus the detected boxes with cars are 64x64 as well. Convolutional
+neural networks seem really appropriate for this task as I don't have to come up
+with a sliding window strategy but obtain the highly probably windows of cars
 naturally. To be specific, the output shape of the last layer is `(25, 153, 1)`
 instead of `(1, 1, 1)`.  This output is shown here as the small red windows:
 
