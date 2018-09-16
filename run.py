@@ -23,7 +23,6 @@ from model import *
 ymin = 400
 ymax = 660
 xmax = 1280
-box_size = 8
 probability_threshold = 0.999999
 
 # Create model with bigger input and without final flatten layer
@@ -50,11 +49,11 @@ def search_cars(img):
   y_indices = mesh_y[heat[0,:,:,0] > probability_threshold]
   hot_windows = []
   for x_index, y_index in zip(x_indices,y_indices):
-      x_start = x_index * box_size
-      y_start = ymin + y_index * box_size
+      x_start = x_index * 8
+      y_start = ymin + y_index * 8
       hot_windows.append(((x_start, y_start),
-                          (x_start + box_size * box_size,
-                           y_start + box_size * box_size)))
+                          (x_start + 64,
+                           y_start + 64)))
   return hot_windows
 
 

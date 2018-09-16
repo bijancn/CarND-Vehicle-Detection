@@ -24,8 +24,8 @@ https://arxiv.org/pdf/1412.6806.pdf and various discussions in the
 
 The model definition is found in `model.py`, which is used both for the script
 to train the model (`train.py`) and the script to run the model in the image
-processing pipeline (`run.py`). To avoid overfitting, I add dropout layers
-with 50 % drop out inbetween the convolution layers.
+processing pipeline (`run.py`). To reduce overfitting, dropout layers with 50 %
+drop out probablity are laid inbetween the convolution layers.
 ```
 Layer (type)                 Output Shape              Param #
 =================================================================
@@ -111,11 +111,12 @@ detections. With this adapted model, I load in the trained model weights and
 use it to `predict` in the `search_cars` function. The output of this are images
 themselves attached with the probability that it is a car. I only keep images
 that have a probability that is higher than `probability_threshold = 0.999999`.
-Convolutional neural networks seem really appropriate for this task as I don't
-have to come up with a sliding window strategy but obtain the highly probably
-windows of cars naturally. To be specific, the output shape of the last layer is
-`(25, 153, 1)` instead of `(1, 1, 1)`.  This output is shown here as the small
-red windows:
+For the representation on the final image, we have to remember that we have used
+64x64 images, thus the detected frames are 64x64 as well. Convolutional neural
+networks seem really appropriate for this task as I don't have to come up with a
+sliding window strategy but obtain the highly probably windows of cars
+naturally. To be specific, the output shape of the last layer is `(25, 153, 1)`
+instead of `(1, 1, 1)`.  This output is shown here as the small red windows:
 
 ![alt text][image2]
 
