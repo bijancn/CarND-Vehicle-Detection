@@ -12,7 +12,7 @@ network on car images following the suggestions from numerous students in the
 
 [//]: # (Image References)
 [image1]: ./output_images/training_data_overview.png
-[image2]: ./output_images/test1.jpg
+[image2]: ./output_images/test_images/test1.jpg
 [image3]: ./examples/sliding_windows.jpg
 [image4]: ./examples/sliding_window.jpg
 [image5]: ./examples/bboxes_and_heat.png

@@ -128,7 +128,7 @@ history = None
 prev_frames = []
 prev_curvatures = []
 prev_car_off = []
-history = deque(maxlen=15)
+history = deque(maxlen=30)
 #  video = 'test_video.mp4'
 video = 'project_video.mp4'
 clip = VideoFileClip(video)
