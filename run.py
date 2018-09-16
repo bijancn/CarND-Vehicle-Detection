@@ -24,11 +24,12 @@ ymin = 400
 ymax = 660
 xmax = 1280
 box_size = 8
-probability_threshold = 0.999
+probability_threshold = 0.999999
 
 # Create model with bigger input and without final flatten layer
 heatmodel = create_model((ymax - ymin, xmax, 3))
 heatmodel.load_weights('./model.h5')
+heatmodel.summary()
 SAVE_IMAGES = False
 
 

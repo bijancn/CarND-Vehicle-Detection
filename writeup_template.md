@@ -12,7 +12,7 @@ network on car images following the suggestions from numerous students in the
 
 [//]: # (Image References)
 [image1]: ./output_images/training_data_overview.png
-[image2]: ./examples/HOG_example.jpg
+[image2]: ./output_images/test1.jpg
 [image3]: ./examples/sliding_windows.jpg
 [image4]: ./examples/sliding_window.jpg
 [image5]: ./examples/bboxes_and_heat.png
@@ -105,15 +105,17 @@ The final training run had the following history:
 To reuse our model that has been trained on the 64x64 images, we simply change
 the input dimensions from `(64,64,3)` to `(ymax - ymin, xmax, 3)`, whereby I
 only feed in the part of the image that is relevant for vehicle detection `ymax
-= 660` and `ymin = 400`. On the horizontal, the whole image is used, thus `xmax
-= 1280`. The cropping in the vertical speeds up the processing and avoids
-bogus detections. With this adapted model, we load in the trained model weights
-and use it to `predict`. The output of this are images themselves attached with
-the probability that it is a car. I only keep images that have a probability
-that is higher than `probability_threshold = 0.999`. Convolutional neural
-networks seem really appropriate for this task as we don't have to invent a
-weird sliding window search but obtain this naturally. This output is shown
-here as the small red windows:
+= 660` and `ymin = 400`. Keras then takes care to adapt the dimensions of all
+following layers.  On the horizontal, the whole image is used, thus `xmax =
+1280`. The cropping in the vertical speeds up the processing and avoids bogus
+detections. With this adapted model, we load in the trained model weights and
+use it to `predict`. The output of this are images themselves attached with the
+probability that it is a car. I only keep images that have a probability that
+is higher than `probability_threshold = 0.999`. Convolutional neural networks
+seem really appropriate for this task as we don't have to invent a weird
+sliding window search but obtain this naturally. To be specific, the output
+shape of the last layer is `(25, 153, 1)` instead of `(1, 1, 1)`. This output
+is shown here as the small red windows:
 
 ![alt text][image2]
 
