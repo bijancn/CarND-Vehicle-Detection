@@ -91,7 +91,38 @@ cars as `1.0` and non-cars as `0.0`:
 
 ![alt text][image1]
 
-## Combining the results to a heat map
+### Training results and tuning
+As mentioned before, the code to train the model is found in `train.py`.
+I have experimented with both `mean_squared_error` and `mean_absolute_error` as
+well as `Adam` and `RMSprop` optimizers. I got the best results with the
+`mean_squared_error` and the `RMSprop` optimizer. To avoid overfitting, I
+activated an `EarlyStopping` callback. To make optimal use of the `g2.2xlarge`
+machine, I used a batch size of 128.
+
+The final training run had the following history:
+
+## Combining the results of the neural network
+To reuse our model that has been trained on the 64x64 images, we simply change
+the input dimensions from `(64,64,3)` to `(ymax - ymin, xmax, 3)`, whereby I
+only feed in the part of the image that is relevant for vehicle detection `ymax
+= 660` and `ymin = 400`. On the horizontal, the whole image is used, thus `xmax
+= 1280`. The cropping in the vertical speeds up the processing and avoids
+bogus detections. With this adapted model, we load in the trained model weights
+and use it to `predict`. The output of this are images themselves attached with
+the probability that it is a car. I only keep images that have a probability
+that is higher than `probability_threshold = 0.999`. Convolutional neural
+networks seem really appropriate for this task as we don't have to invent a
+weird sliding window search but obtain this naturally. This output is shown
+here as the small red windows:
+
+![alt text][image2]
+
+All other test images can be found in [output_images/test_images]
+
+The basic pipeline is described in `find_boxes` of `run.py`.
+
+## Sliding Window Search
+
 
 ## Video implementation
 
@@ -102,36 +133,7 @@ cars as `1.0` and non-cars as `0.0`:
 
 
 
-#### 1. Explain how (and identify where in your code) you extracted HOG features from the training images.
-
-The code for this step is contained in the first code cell of the IPython notebook (or in lines # through # of the file called `some_file.py`).
-
-I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an example of one of each of the `vehicle` and `non-vehicle` classes:
-
-![alt text][image1]
-
-I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
-
-Here is an example using the `YCrCb` color space and HOG parameters of `orientations=8`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
-
-
-![alt text][image2]
-
-#### 2. Explain how you settled on your final choice of HOG parameters.
-
-I tried various combinations of parameters and...
-
-#### 3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
-
-I trained a linear SVM using...
-
 ### Sliding Window Search
-
-#### 1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
-
-I decided to search random window positions at random scales all over the image and came up with this (ok just kidding I didn't actually ;):
-
-![alt text][image3]
 
 #### 2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 

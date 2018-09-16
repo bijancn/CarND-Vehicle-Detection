@@ -49,7 +49,7 @@ if (SAVE_IMAGES):
 
 #  adam = optimizers.Adam(lr=0.00005)
 #  model.compile(loss='mean_absolute_error', optimizer=adam, metrics=['accuracy'])
-model.compile(loss='mse',optimizer='rmsprop',metrics=['accuracy'])
+model.compile(loss='mean_squared_error', optimizer='rmsprop', metrics=['accuracy'])
 checkpoint = callbacks.ModelCheckpoint("weights.{epoch:02d}-{val_loss:.3f}.hdf5",
                           monitor='val_loss',
                           verbose=1,

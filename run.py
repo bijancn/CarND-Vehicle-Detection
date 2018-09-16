@@ -24,19 +24,18 @@ ymin = 400
 ymax = 660
 xmax = 1280
 box_size = 8
+probability_threshold = 0.999
 
 # Create model with bigger input and without final flatten layer
 heatmodel = create_model((ymax - ymin, xmax, 3))
-heatmodel.load_weights('./weights.13-0.02.hdf5')
+heatmodel.load_weights('./model.h5')
 SAVE_IMAGES = False
 
 
-def draw_boxes(img, bounding_boxes, color=(0, 0, 255), thick=6):
+def draw_boxes(img, bounding_boxes, color=(255, 0, 0), thick=2):
   draw_img = np.copy(img)
   for bbox in bounding_boxes:
-      # Draw a rectangle given bbox coordinates
       cv2.rectangle(draw_img, bbox[0], bbox[1], color, thick)
-  # Return the image copy with boxes drawn
   return draw_img
 
 
@@ -45,8 +44,8 @@ def search_cars(img):
   heat = heatmodel.predict(cropped.reshape(1, cropped.shape[0],
                                            cropped.shape[1], cropped.shape[2]))
   mesh_x, mesh_y = np.meshgrid(np.arange(heat.shape[2]), np.arange(heat.shape[1]))
-  x_indices = mesh_x[heat[0,:,:,0]>0.9999999]
-  y_indices = mesh_y[heat[0,:,:,0]>0.9999999]
+  x_indices = mesh_x[heat[0,:,:,0] > probability_threshold]
+  y_indices = mesh_y[heat[0,:,:,0] > probability_threshold]
   hot_windows = []
   for x_index, y_index in zip(x_indices,y_indices):
       x_start = x_index * box_size
@@ -82,22 +81,23 @@ def draw_labeled_bboxes(img, boxes):
 
 def find_boxes(img):
   hot_windows = search_cars(img)
+  window_img = draw_boxes(img, hot_windows)
   heat = np.zeros_like(img[:,:,0]).astype(np.float)
   heat = add_heat(heat,hot_windows)
   heat = apply_threshold(heat, 3)
   heatmap = np.clip(heat, 0, 255)
   boxes = label(heatmap)
-  return boxes
+  return boxes, window_img
 
 
 def process_image(img):
-  boxes = find_boxes(img)
-  draw_img = draw_labeled_bboxes(img, boxes)
+  boxes, window_img = find_boxes(img)
+  draw_img = draw_labeled_bboxes(window_img, boxes)
   return draw_img
 
 
 def pipeline(img):
-    boxes = find_boxes(img)
+    boxes, _ = find_boxes(img)
     for car_number in range(1, boxes[1]+1):
         nonzero = (boxes[0] == car_number).nonzero()
         nonzeroy = np.array(nonzero[0])
@@ -120,6 +120,7 @@ if (SAVE_IMAGES):
       fig = plt.figure(figsize=(12,20))
       plt.imshow(img_lane)
       fig.savefig('output_images/' + image, bbox_inches='tight', pad_inches=0)
+  exit()
 
 history = None
 
